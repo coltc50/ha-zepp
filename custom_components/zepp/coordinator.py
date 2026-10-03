@@ -434,6 +434,7 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             weight_items = await async_fetch_weight_records(
                 session, self.host, self.apptoken, self.userid, limit=2
             )
+            _LOGGER.debug("Zepp weight_items API response: %s", weight_items)
             if weight_items:
                 latest_w = weight_items[0]
                 result["weight"] = latest_w.get("weight")
@@ -445,7 +446,7 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         except ZeppAuthError:
             raise
         except Exception as err:
-            _LOGGER.debug("Error updating weight records: %s", err)
+            _LOGGER.warning("Error updating weight records: %s", err)
 
         # 8. Device battery & status
         try:
