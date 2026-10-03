@@ -137,12 +137,12 @@ async def async_setup_entry(
         ])
 
         # 6. Body Composition (only instantiate if scale records exist in Zepp account)
-        if coordinator.data.get("weight") is not None:
-            entities.extend([
-                ZeppWeightSensor(coordinator, device_id, device_name, device_info),
-                ZeppBmiSensor(coordinator, device_id, device_name, device_info),
-                ZeppBodyFatSensor(coordinator, device_id, device_name, device_info),
-            ])
+#        if coordinator.data.get("weight") is not None:
+        entities.extend([
+            ZeppWeightSensor(coordinator, device_id, device_name, device_info),
+            ZeppBmiSensor(coordinator, device_id, device_name, device_info),
+            ZeppBodyFatSensor(coordinator, device_id, device_name, device_info),
+        ])
 
         # 7. Historical Sync Status
         entities.append(
