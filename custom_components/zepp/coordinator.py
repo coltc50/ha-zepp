@@ -126,6 +126,11 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "readiness_score": None,
             "total_pai": None,
             "hrv": None,
+            # Mean of the latest HRV event's samples (the night), as the Zepp app shows it.
+            "hrv_night": None,
+            "hrv_night_samples": None,
+            "hrv_night_min": None,
+            "hrv_night_max": None,
             "training_load_total": None,
             "training_load_today": None,
             "training_load_min": None,
@@ -408,6 +413,12 @@ class ZeppCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     last_sample = samples[-1]
                     if "hrv" in last_sample:
                         result["hrv"] = last_sample["hrv"]
+                    vals = [x["hrv"] for x in samples if isinstance(x, dict) and isinstance(x.get("hrv"), (int, float)) and x["hrv"] > 0]
+                    if vals:
+                        result["hrv_night"] = round(sum(vals) / len(vals))
+                        result["hrv_night_samples"] = len(vals)
+                        result["hrv_night_min"] = min(vals)
+                        result["hrv_night_max"] = max(vals)
         except ZeppAuthError:
             raise
         except Exception as err:

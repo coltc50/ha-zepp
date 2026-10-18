@@ -123,6 +123,7 @@ async def async_setup_entry(
             ZeppBreathingScoreSensor(coordinator, device_id, device_name, device_info),
             ZeppPaiSensor(coordinator, device_id, device_name, device_info),
             ZeppHrvSensor(coordinator, device_id, device_name, device_info),
+            ZeppHrvNightSensor(coordinator, device_id, device_name, device_info),
         ]
         if coordinator.data.get("readiness_score") is not None:
             health_sensors.append(
@@ -608,6 +609,33 @@ class ZeppHrvSensor(CoordinatorEntity[ZeppCoordinator], SensorEntity):
     @property
     def native_value(self) -> float | None:
         return self.coordinator.data.get("hrv")
+
+
+class ZeppHrvNightSensor(CoordinatorEntity[ZeppCoordinator], SensorEntity):
+    """The night's HRV: the mean of the latest HRV event's samples, not its last one."""
+
+    _attr_has_entity_name = True
+    _attr_name = "HRV Night"
+    _attr_icon = "mdi:sine-wave"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = "ms"
+
+    def __init__(self, coordinator: ZeppCoordinator, device_id: str, device_name: str, device_info: DeviceInfo) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{device_id}_hrv_night"
+        self._attr_device_info = device_info
+
+    @property
+    def native_value(self) -> int | None:
+        return self.coordinator.data.get("hrv_night")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        return {
+            "samples": self.coordinator.data.get("hrv_night_samples"),
+            "min": self.coordinator.data.get("hrv_night_min"),
+            "max": self.coordinator.data.get("hrv_night_max"),
+        }
 
 
 # ==================== Training Load Sensors ====================
